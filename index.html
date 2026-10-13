@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MI RUTINA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--tx:#14171c;--mu:#6b7280;--ac:#e8590c;--ok:#2f9e44;--bd:#e3e5e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101216;--card:#1b1e24;--tx:#f1f2f4;--mu:#9aa1ac;--bd:#2b2f37}}
+:root[data-theme="dark"]{--bg:#101216;--card:#1b1e24;--tx:#f1f2f4;--mu:#9aa1ac;--bd:#2b2f37}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:640px;margin:auto;padding:12px 12px 90px}
+h1{font-size:20px;margin:6px 4px 10px}
+.tabs{display:flex;gap:6px;overflow-x:auto;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:6px 0;z-index:5}
+.tabs button{flex:1;white-space:nowrap;padding:10px 12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font-weight:600;font-size:14px}
+.tabs button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.ex{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px 0}
+.ex.done{border-color:var(--ok)}
+.top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.nm{font-weight:700;font-size:16px;text-transform:capitalize}
+.meta{color:var(--mu);font-size:13px;margin-top:2px}
+.note{color:var(--ac);font-size:13px;margin-top:2px}
+.sets{display:grid;gap:6px;margin-top:10px}
+.set{display:grid;grid-template-columns:28px 1fr 1fr 40px;gap:6px;align-items:center}
+.set span{color:var(--mu);font-size:13px;text-align:center}
+input[type=number],input[type=url]{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:15px}
+.chk{width:40px;height:38px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:18px}
+.chk.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.row{display:flex;gap:8px;margin-top:10px}
+.btn{flex:1;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-weight:600;font-size:14px}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}
+.last{font-size:12px;color:var(--mu);margin-top:6px}
+#timer{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:616px;margin:auto;background:var(--tx);color:var(--bg);border-radius:14px;padding:12px 16px;display:none;justify-content:space-between;align-items:center;font-weight:700;z-index:10}
+#timer b{font-size:22px}
+#timer button{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:6px 12px}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;flex-direction:column;justify-content:center;padding:14px;z-index:20}
+#modal .box{max-width:640px;width:100%;margin:auto}
+#modal iframe,#modal video{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
+#modal .btn{margin-top:10px;width:100%}
+.tools{display:flex;gap:8px;margin:6px 0}
+.pdfb{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin:14px 0 6px;padding:14px;border:2px dashed var(--ac);border-radius:14px;background:var(--card);color:var(--tx);font-size:15px}
+.pdfb .pi{font-size:28px}
+.pdfb small{color:var(--mu)}
+</style>
+</head>
+<body>
+<h1>💪 MI RUTINA</h1>
+<div class="tabs" id="tabs"></div>
+<div class="tools"><button class="btn" id="reset">Reiniciar checks del día</button></div>
+<div id="list"></div>
+<div id="timer"><span>Descanso <b id="tt">0:00</b></span><button id="tx">Parar</button></div>
+<div id="modal"><div class="box"><div id="player"></div><button class="btn" id="vc">Cerrar</button></div></div>
+
+<script>
+var D=[
+{n:"Entreno 1",e:[
+["peck deck",3,"15",60],["press banca con barra",4,"4 u 6",180],["press banca inclinado en multipower",4,"12",120],["press militar en multipower",4,"4 u 6",120],["elevaciones con mancuernas",3,"20",60],["extensión de tríceps desde polea",5,"8",60]]},
+{n:"Entreno 2",e:[
+["dominadas",3,"8",120],["remo con barra","4","4 u 6",180,"En Smith"],["remo Gironda",4,"15",60],["pájaros con mancuernas",3,"15",60],["curl deslizador",4,"8",60,"Con barra W"],["curl bayesian",4,"12 u 15",0],["curl con banco inclinado",4,"6 u 8",0]]},
+{n:"Entreno 3",e:[
+["extensión de cuádriceps",3,"20",0,"Bajada de 5 segundos"],["sentadilla hack",5,"8 u 6",0],["sentadilla búlgara",4,"15",0,"1 segundo abajo"],["curl de isquios tumbado",5,"12 u 15",0],["peso muerto desde bloques",4,"15",0],["curl nórdico inverso",4,"8",0]]},
+{n:"Brazos/Hombros",e:[
+["press militar con mancuernas",4,"6 u 8",120],["press francés con mancuernas",4,"15",120],["extensión de tríceps desde polea",5,"8",60],["curl araña",4,"10",120],["curl bayesian",5,"6",60]]}
+];
+var VID={"0-0":"https://youtu.be/Ha1XOWOA51o","0-1":"https://youtu.be/dWV4uWd2GvM","0-2":"https://www.youtube.com/watch?v=WpjYDxwoXA0","0-3":"https://www.youtube.com/shorts/E7ngsffMPR0","0-4":"https://www.youtube.com/shorts/suVq--PEQ3c","0-5":"https://www.youtube.com/shorts/23qUSrn8lIU","1-0":"https://youtu.be/xgDezCv-0jA","1-1":"https://youtu.be/pjIbGzEhS4Q","1-2":"https://youtu.be/GBXQBhuCT3U","1-3":"https://youtu.be/GbPxyECFxCI","1-4":"https://www.youtube.com/watch?v=ZHa0OAcn7Bc","1-5":"https://youtu.be/eyxodt_n8M4","1-6":"https://youtu.be/m2VZFlcJsaM","2-0":"https://www.youtube.com/shorts/iNvPzf15KKA","2-2":"https://www.youtube.com/shorts/QuKHDwIocyg","2-3":"https://www.youtube.com/shorts/lxrqWX_7KSw","2-4":"https://www.youtube.com/shorts/3u9M3nh0C0g","2-5":"https://www.youtube.com/shorts/GrAcC40jjOg","3-0":"https://youtu.be/o5M9RZ-vWrc","3-1":"https://youtu.be/fhhmRonWIBw","3-2":"https://www.youtube.com/shorts/23qUSrn8lIU","3-3":"https://youtu.be/7UBeZ__EOHI","3-4":"https://youtu.be/eyxodt_n8M4"};
+var W=[["Calentamiento 1",3,"10","https://youtube.com/shorts/ZOP6RPjdAhA"],["Calentamiento 2",2,"15","https://youtube.com/shorts/uWIJ3TJJwbQ"],["Calentamiento 3",2,"20","https://youtu.be/huGj4aBk9C4"],["Calentamiento 4",2,"15","https://youtube.com/shorts/2of247Kt0tU"],["Calentamiento 5",3,"30 seg","https://youtube.com/shorts/XPcT3capkyk"],["Calentamiento 6",2,"20","https://youtube.com/shorts/F5owFeKgpoc"],["Calentamiento 7",2,"15","https://youtube.com/shorts/nxuwq178gLA"],["Calentamiento 8",2,"10","https://youtu.be/-CiWQ2IvY34"],["Calentamiento 9",2,"12","https://youtube.com/shorts/Re9RqrxGKvk"],["Calentamiento 10",3,"10","https://youtube.com/shorts/ZOP6RPjdAhA"],["Calentamiento 11",2,"20","https://youtube.com/shorts/fuWq7fg74dc"]];
+W.forEach(function(w,i){VID["W"+i]=w[3]});
+var DEF={b:[[0,1,2],[9,10],[3,4,5,6,7,8],[9,10]],a:[[],[],[],[]]};
+var KEY="rutinaGymV1",S={};
+try{S=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){S={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var day=0;
+try{day=parseInt(localStorage.getItem(KEY+"day")||"0")||0}catch(e){}
+function g(k){return S[k]||(S[k]={})}
+function tabs(){var t=document.getElementById("tabs");t.innerHTML="";D.forEach(function(d,i){var b=document.createElement("button");b.textContent=d.n;b.className=i==day?"on":"";b.onclick=function(){day=i;try{localStorage.setItem(KEY+"day",i)}catch(e){}tabs();render()};t.appendChild(b)})}
+function fmt(s){return Math.floor(s/60)+":"+("0"+s%60).slice(-2)}
+function render(){
+ var L=document.getElementById("list");L.innerHTML="";wblock(L,"b");
+ D[day].e.forEach(function(x,i){
+  var id=day+"-"+i,st=g(id),ns=+x[1],card=document.createElement("div");
+  var done=0;for(var s=0;s<ns;s++)if(st["c"+s])done++;
+  card.className="ex"+(done==ns?" done":"");
+  var h='<div class="top"><div><div class="nm">'+x[0]+'</div><div class="meta">'+ns+' series × '+x[2]+' reps'+(x[3]?' · descanso '+fmt(x[3]):'')+'</div>'+(x[4]?'<div class="note">'+x[4]+'</div>':'')+'</div><div class="meta">'+done+'/'+ns+'</div></div><div class="sets">';
+  for(var s=0;s<ns;s++){
+   h+='<div class="set"><span>'+(s+1)+'</span><input type="number" inputmode="decimal" placeholder="kg" data-k="'+id+'" data-f="kg'+s+'" value="'+(st["kg"+s]||"")+'"><input type="number" inputmode="numeric" placeholder="reps" data-k="'+id+'" data-f="r'+s+'" value="'+(st["r"+s]||"")+'"><button class="chk'+(st["c"+s]?" on":"")+'" data-id="'+id+'" data-s="'+s+'" data-rest="'+x[3]+'">✓</button></div>';
+  }
+  h+='</div><div class="row"><button class="btn p" data-v="'+id+'">▶ Video (mute)</button>'+(x[3]?'<button class="btn" data-t="'+x[3]+'">⏱ '+fmt(x[3])+'</button>':'')+'</div>';
+  card.innerHTML=h;L.appendChild(card);
+ });
+ wblock(L,"a");var pb=document.createElement("button");pb.className="pdfb";var fd=new Date().toLocaleDateString("es-AR");pb.innerHTML='<span class="pi">📄</span><span><b>'+D[day].n+' · '+fd+'</b><br><small>Tocá para bajar el PDF con tus datos</small></span>';pb.onclick=function(){exportPDF(day)};L.appendChild(pb);
+ L.querySelectorAll("input[data-k]").forEach(function(el){el.oninput=function(){g(el.dataset.k)[el.dataset.f]=el.value;save()}});
+ L.querySelectorAll(".chk").forEach(function(b){b.onclick=function(){var o=g(b.dataset.id),k="c"+b.dataset.s;o[k]=!o[k];save();if(o[k]&&+b.dataset.rest)startT(+b.dataset.rest);render()}});
+ L.querySelectorAll("[data-t]").forEach(function(b){b.onclick=function(){startT(+b.dataset.t)}});
+ L.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){openV(b.dataset.v)}});
+}
+document.getElementById("reset").onclick=function(){if(!confirm("¿Destildar las series de este día? (los kg y reps se conservan)"))return;D[day].e.forEach(function(x,i){var o=g(day+"-"+i);Object.keys(o).forEach(function(k){if(k[0]=="c")delete o[k]})});save();render()};
+var AC=null;
+function unlock(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}}
+function beep(t,f,d){try{var o=AC.createOscillator(),gn=AC.createGain(),n=AC.currentTime+t;o.type="square";o.frequency.value=f;gn.gain.setValueAtTime(0.0001,n);gn.gain.exponentialRampToValueAtTime(0.6,n+0.01);gn.gain.exponentialRampToValueAtTime(0.0001,n+d);o.connect(gn);gn.connect(AC.destination);o.start(n);o.stop(n+d+0.02)}catch(e){}}
+function alarm(){for(var i=0;i<4;i++)beep(i*0.35,1000,0.22)}
+function wsel(d,k){var key="wsel-"+d+"-"+k;if(!S[key])S[key]={l:DEF[k][d].slice()};return S[key].l}
+function wblock(L,kind){
+ var l=wsel(day,kind),sec=document.createElement("div");
+ sec.innerHTML='<div class="nm" style="margin:16px 4px 0">'+(kind=="b"?"🔥 Calentamiento · antes de empezar":"🧘 Estiramiento · al terminar")+'</div>';
+ l.forEach(function(wi){var w=W[wi],id="wc-"+day+"-"+kind+"-"+wi,st=g(id),ns=w[1],dn=0,s;for(s=0;s<ns;s++)if(st["c"+s])dn++;
+  var c=document.createElement("div");c.className="ex"+(dn==ns?" done":"");
+  var t='<div class="top"><div><div class="nm">'+w[0]+'</div><div class="meta">'+ns+' series × '+w[2]+'</div></div><div class="meta">'+dn+'/'+ns+'</div></div><div class="row">';
+  for(s=0;s<ns;s++)t+='<button class="chk'+(st["c"+s]?" on":"")+'" data-id="'+id+'" data-s="'+s+'" data-rest="0">✓</button>';
+  t+='<button class="btn p" data-v="W'+wi+'">▶ Video (mute)</button></div>';c.innerHTML=t;sec.appendChild(c)});
+ var pk=document.createElement("button");pk.className="btn";pk.style.cssText="width:100%;margin-top:6px";pk.textContent=l.length?"✏️ Cambiar ejercicios":"＋ Elegir ejercicios";pk.onclick=function(){pick(kind)};sec.appendChild(pk);L.appendChild(sec)}
+function pick(kind){
+ var l=wsel(day,kind).slice(),o=document.createElement("div");o.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:15;overflow:auto;padding:14px";
+ var h='<div style="max-width:640px;margin:auto;background:var(--card);color:var(--tx);border-radius:14px;padding:14px"><div class="nm">Elegí los ejercicios ('+(kind=="b"?"calentamiento":"estiramiento")+' · '+D[day].n+')</div><div class="meta" style="margin:4px 0 8px">Tocá ▶ Ver para mirar cada video y tildá los que van acá.</div>';
+ W.forEach(function(w,i){h+='<div class="set" style="grid-template-columns:40px 1fr 90px;margin:6px 0"><input type="checkbox" data-i="'+i+'" '+(l.indexOf(i)>-1?"checked":"")+' style="width:24px;height:24px"><span style="text-align:left;color:var(--tx)">'+w[0]+' · '+w[1]+'×'+w[2]+'</span><button class="btn" data-pv="'+i+'">▶ Ver</button></div>'});
+ h+='<div class="row"><button class="btn" id="pc">Cancelar</button><button class="btn p" id="ps">Guardar</button></div></div>';
+ o.innerHTML=h;document.body.appendChild(o);
+ o.querySelectorAll("[data-pv]").forEach(function(b){b.onclick=function(){openV("W"+b.dataset.pv)}});
+ document.getElementById("pc").onclick=function(){o.remove()};
+ document.getElementById("ps").onclick=function(){var n=[];o.querySelectorAll("input[data-i]").forEach(function(c){if(c.checked)n.push(+c.dataset.i)});S["wsel-"+day+"-"+kind]={l:n};save();o.remove();render()};
+}
+function pad(n){return ("0"+n).slice(-2)}
+function exportPDF(di){
+ var J=window.jspdf;if(!J){alert("No se pudo cargar el generador de PDF. Revisá tu conexión.");return}
+ var d=D[di],n=new Date(),fd=n.toLocaleDateString("es-AR"),iso=n.getFullYear()+"-"+pad(n.getMonth()+1)+"-"+pad(n.getDate());
+ var doc=new J.jsPDF({unit:"mm",format:"a4"}),y=18;
+ function ln(t,sz,b,gap){if(y>280){doc.addPage();y=18}doc.setFont("helvetica",b?"bold":"normal");doc.setFontSize(sz);doc.text(t,15,y);y+=gap}
+ function wp(k){var l=wsel(di,k);if(!l.length)return;y+=2;ln(k=="b"?"CALENTAMIENTO (ANTES)":"ESTIRAMIENTO (AL TERMINAR)",12,1,6);l.forEach(function(wi){var w=W[wi],st=g("wc-"+di+"-"+k+"-"+wi),dn=0,s;for(s=0;s<w[1];s++)if(st["c"+s])dn++;ln(w[0]+": "+w[1]+" x "+w[2]+"  ("+dn+"/"+w[1]+" hechas)",10,0,5.5)})}
+ ln("MI RUTINA - "+d.n,18,1,8);ln("Fecha: "+fd,11,0,10);wp("b");
+ d.e.forEach(function(x,i){var st=g(di+"-"+i),ns=+x[1],dn=0,s;for(s=0;s<ns;s++)if(st["c"+s])dn++;
+  y+=2;ln(x[0].toUpperCase()+"  ("+dn+"/"+ns+" series)",12,1,6);ln("Objetivo: "+ns+" x "+x[2]+" reps"+(x[4]?" - "+x[4]:""),10,0,5.5);
+  for(s=0;s<ns;s++)ln("Serie "+(s+1)+":  "+(st["kg"+s]||"-")+" kg  x  "+(st["r"+s]||"-")+" reps"+(st["c"+s]?"   [hecha]":""),10,0,5.5)});
+ wp("a");var data=doc.output("arraybuffer"),fn=d.n.replace(/[^\w]+/g,"_")+"_"+iso+".pdf";
+ window.claude.use("downloads").then(function(dl){if(!dl){alert("La descarga no está disponible en esta vista.");return}return dl.save({filename:fn,data:data})}).catch(function(e){if(!e||e.code!=="declined")alert("No se pudo guardar el PDF.")});
+}
+var iv=null,left=0;
+function startT(s){unlock();clearInterval(iv);left=s;var T=document.getElementById("timer");T.style.display="flex";document.getElementById("tt").textContent=fmt(left);
+ iv=setInterval(function(){left--;if(left>0&&left<=3)beep(0,700,0.12);document.getElementById("tt").textContent=fmt(Math.max(left,0));if(left<=0){clearInterval(iv);alarm();try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}setTimeout(function(){T.style.display="none"},1500)}},1000)}
+document.getElementById("tx").onclick=function(){clearInterval(iv);document.getElementById("timer").style.display="none"};
+function ytId(u){var m=u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/);return m?m[1]:null}
+function openV(id){
+ var st=g(id),P=document.getElementById("player"),M=document.getElementById("modal"),url=st.video||VID[id]||"";
+ M.style.display="flex";
+ function show(u){
+  var y=ytId(u);
+  if(y)P.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+y+'?mute=1&playsinline=1&rel=0" allow="autoplay;encrypted-media;picture-in-picture" allowfullscreen></iframe>';
+  else if(/\.(mp4|webm|mov)(\?|$)/i.test(u))P.innerHTML='<video src="'+u+'" muted controls playsinline autoplay loop></video>';
+  else P.innerHTML='<p style="color:#fff">Link no reconocido. Usá un link de YouTube o un .mp4.</p>';
+  P.innerHTML+='<p style="color:#ccc;font-size:12px">Si no carga, tocá "Abrir en YouTube" y silenciá desde ahí.</p><a class="btn" style="display:block;text-align:center;text-decoration:none;margin-top:6px" href="'+u+'" target="_blank" rel="noopener">Abrir en YouTube</a><button class="btn" id="vchg">Cambiar link</button>';
+  document.getElementById("vchg").onclick=ask;
+ }
+ function ask(){
+  P.innerHTML='<p style="color:#fff;margin:0 0 8px">Pegá el link del video de este ejercicio (el de tu PDF). Se guarda en tu celular.</p><input type="url" id="vin" placeholder="https://youtube.com/..." value="'+url+'"><button class="btn p" id="vok" style="margin-top:8px;width:100%">Guardar y ver</button>';
+  document.getElementById("vok").onclick=function(){var v=document.getElementById("vin").value.trim();if(!v)return;st.video=v;url=v;save();show(v)};
+ }
+ url?show(url):ask();
+}
+document.getElementById("vc").onclick=function(){document.getElementById("player").innerHTML="";document.getElementById("modal").style.display="none"};
+tabs();render();
+</script>
+</body>
+</html>
